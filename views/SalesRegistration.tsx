@@ -1,8 +1,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Minus, Trash2, ScanLine, CreditCard, Wallet, QrCode, ArrowRight, Barcode, ShoppingBag, Receipt, CheckCircle2, X, AlertCircle, RefreshCw, Calculator, Banknote } from 'lucide-react';
+import { Plus, Minus, Trash2, ScanLine, CreditCard, Wallet, QrCode, ArrowRight, Barcode, ShoppingBag, Receipt, CheckCircle2, X, AlertCircle, RefreshCw, Calculator, Banknote, MessageSquare, Mail, Send, FileText, Share2, Loader2 } from 'lucide-react';
 import { Product, CartItem, Sale, PaymentMethod, PaymentEntry } from '../types';
 import Scanner from '../components/Scanner';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 interface SalesRegistrationProps {
   products: Product[];
@@ -23,6 +25,10 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
   const [lastSale, setLastSale] = useState<Sale | null>(null);
   const [manualCode, setManualCode] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const receiptRef = useRef<HTMLDivElement>(null);
+
+  // Estados de Envio
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   useEffect(() => {
     if (!isScannerOpen && !showCheckout && !lastSale && !pendingPayment) {
@@ -99,7 +105,7 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
     setCollectedPayments(newPayments);
     setPendingPayment(null);
 
-    if (newTotalPaid >= total - 0.01) { // margem de erro de arredondamento
+    if (newTotalPaid >= total - 0.01) {
       finalizeSale(newPayments);
     } else {
       setCheckoutStep('selection');
@@ -108,7 +114,6 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
   };
 
   const finalizeSale = (allPayments: PaymentEntry[]) => {
-    // Adicionado operatorId para satisfazer a interface Sale exigida pelo TypeScript.
     const newSale: Sale = {
       id: Math.random().toString(36).substr(2, 9).toUpperCase(),
       date: new Date().toISOString(),
@@ -137,13 +142,65 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
     }
   };
 
+  const handleSharePDF = async () => {
+    if (!receiptRef.current || !lastSale) return;
+    
+    setIsGeneratingPDF(true);
+    try {
+      // Captura o cupom como imagem
+      const canvas = await html2canvas(receiptRef.current, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        logging: false
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: [80, (canvas.height * 80) / canvas.width] // Formato papel térmico 80mm
+      });
+
+      const imgWidth = 80;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      
+      const pdfBlob = pdf.output('blob');
+      const fileName = `Cupom_${lastSale.id}.pdf`;
+      const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+      // Tenta usar a API de Compartilhamento Nativa
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'Cupom Fiscal - Mercado Online',
+          text: `Segue o cupom fiscal da sua compra no valor de R$ ${lastSale.total.toFixed(2)}`
+        });
+      } else {
+        // Fallback: Download do arquivo
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(pdfBlob);
+        link.download = fileName;
+        link.click();
+        alert("PDF gerado com sucesso! Verifique sua pasta de downloads para compartilhar.");
+      }
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      alert('Houve um erro ao gerar o PDF do cupom.');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
   if (isScannerOpen) return <Scanner onScan={handleScan} onClose={() => setIsScannerOpen(false)} />;
 
   const ThermalReceipt = ({ sale }: { sale: Sale }) => (
-    <div className="bg-white text-zinc-900 p-6 font-mono text-[11px] leading-tight shadow-2xl max-w-[300px] mx-auto overflow-hidden">
+    <div ref={receiptRef} className="bg-white text-zinc-900 p-8 font-mono text-[11px] leading-tight shadow-2xl max-w-[320px] mx-auto overflow-hidden">
       <div className="text-center space-y-1 mb-4">
         <h2 className="text-sm font-black uppercase">Mercado Online PDV</h2>
-        <p>CNPJ: 00.000.000/0001-00</p>
+        <p className="text-[9px]">CNPJ: 00.000.000/0001-00</p>
+        <p className="text-[9px]">Rua das Flores, 123 - Centro</p>
       </div>
       <div className="border-t border-dashed border-zinc-400 my-2" />
       <div className="flex justify-between mb-2">
@@ -171,8 +228,11 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
           </div>
         ))}
       </div>
-      <div className="text-center mt-4 font-bold pt-2 border-t border-dashed border-zinc-400">
-        OBRIGADO PELA PREFERÊNCIA
+      <div className="text-center mt-6 font-bold pt-2 border-t border-dashed border-zinc-400 text-[10px]">
+        OBRIGADO PELA PREFERÊNCIA!
+        <div className="mt-2 flex justify-center opacity-50">
+           <Barcode size={40} />
+        </div>
       </div>
     </div>
   );
@@ -264,7 +324,7 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
         </button>
       </footer>
 
-      {/* Modal de Checkout Simplificado */}
+      {/* Modal de Checkout */}
       {showCheckout && (
         <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-end justify-center p-4">
           <div className="w-full max-w-sm bg-zinc-900 border-t border-zinc-800 rounded-t-[40px] p-8 space-y-8 animate-in slide-in-from-bottom duration-300">
@@ -273,7 +333,6 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
               <button onClick={() => setShowCheckout(false)} className="bg-zinc-800 p-2 rounded-full"><X size={20}/></button>
             </div>
 
-            {/* Passo 1: Seleção de Tipo (Total ou Parcial) */}
             {checkoutStep === 'selection' && (
               <div className="grid grid-cols-1 gap-4">
                 <button 
@@ -304,7 +363,6 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
               </div>
             )}
 
-            {/* Passo 2: Entrada de Valor (Apenas se Parcial) */}
             {checkoutStep === 'amount' && (
               <div className="space-y-6">
                 <div className="space-y-2">
@@ -331,7 +389,6 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
               </div>
             )}
 
-            {/* Passo 3: Escolha do Método */}
             {checkoutStep === 'method' && (
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
@@ -388,17 +445,40 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
         </div>
       )}
 
-      {/* Resultado Final (Cupom) */}
+      {/* Resultado Final com Fluxo de Envio em PDF */}
       {lastSale && (
-        <div className="fixed inset-0 z-[70] bg-black/98 backdrop-blur-2xl flex flex-col items-center justify-center p-6 animate-in zoom-in-95 duration-300">
-          <div className="w-full max-w-sm flex flex-col gap-6">
-            <CheckCircle2 size={48} className="text-emerald-500 mx-auto" />
-            <div className="max-h-[60vh] overflow-y-auto rounded-3xl">
+        <div className="fixed inset-0 z-[70] bg-black/98 backdrop-blur-2xl flex flex-col items-center justify-center p-6 animate-in zoom-in-95 duration-300 overflow-y-auto">
+          <div className="w-full max-w-sm flex flex-col gap-6 my-auto pb-12">
+            <div className="flex flex-col items-center gap-2">
+               <CheckCircle2 size={48} className="text-emerald-500" />
+               <h2 className="text-xl font-black">Venda Finalizada!</h2>
+            </div>
+            
+            <div className="rounded-[40px] overflow-hidden border border-zinc-800 shadow-2xl">
               <ThermalReceipt sale={lastSale} />
             </div>
-            <button onClick={() => setLastSale(null)} className="w-full py-4 bg-purple-600 rounded-2xl font-black text-white active:scale-95">
-              INICIAR NOVA VENDA
-            </button>
+
+            <div className="space-y-3">
+              <button 
+                onClick={handleSharePDF}
+                disabled={isGeneratingPDF}
+                className="w-full py-5 bg-white text-black rounded-2xl font-black flex items-center justify-center gap-3 active:scale-95 shadow-lg disabled:opacity-50"
+              >
+                {isGeneratingPDF ? (
+                  <Loader2 size={20} className="animate-spin" />
+                ) : (
+                  <Share2 size={20} />
+                )}
+                ENVIAR CUPOM PDF (WHATSAPP/EMAIL)
+              </button>
+
+              <button 
+                onClick={() => setLastSale(null)} 
+                className="w-full py-4 bg-purple-600 rounded-2xl font-black text-white active:scale-95"
+              >
+                PRÓXIMA VENDA
+              </button>
+            </div>
           </div>
         </div>
       )}
