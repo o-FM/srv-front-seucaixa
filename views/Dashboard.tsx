@@ -1,11 +1,18 @@
 
 import React, { useMemo } from 'react';
-import { TrendingUp, Users, DollarSign, Package, ArrowUpRight } from 'lucide-react';
+import { TrendingUp, Users, DollarSign, Package, User } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Sale } from '../types';
 
 interface DashboardProps {
   sales: Sale[];
+}
+
+interface OperatorStat {
+  name: string;
+  vendas: number;
+  itens: number;
+  totalRevenue: number;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ sales }) => {
@@ -14,6 +21,23 @@ const Dashboard: React.FC<DashboardProps> = ({ sales }) => {
     const totalItems = sales.reduce((acc, s) => acc + s.items.reduce((sum, i) => sum + i.quantity, 0), 0);
     const ticketMedio = sales.length > 0 ? totalRevenue / sales.length : 0;
     return { totalRevenue, totalItems, ticketMedio };
+  }, [sales]);
+
+  const operatorStats = useMemo(() => {
+    const grouped = sales.reduce((acc: Record<string, OperatorStat>, s) => {
+      const id = s.operatorId || s.operator; // Fallback para o nome se id não existir
+      if (!acc[id]) {
+        acc[id] = { name: s.operator, vendas: 0, itens: 0, totalRevenue: 0 };
+      }
+      acc[id].vendas += 1;
+      acc[id].totalRevenue += s.total;
+      acc[id].itens += s.items.reduce((sum, i) => sum + i.quantity, 0);
+      return acc;
+    // Fix: Explicitly type the initial value of reduce to Record<string, OperatorStat>
+    }, {} as Record<string, OperatorStat>);
+
+    // Fix: Cast Object.values results to OperatorStat[] to ensure correct property access in sort
+    return (Object.values(grouped) as OperatorStat[]).sort((a, b) => b.totalRevenue - a.totalRevenue);
   }, [sales]);
 
   const chartData = useMemo(() => {
@@ -44,6 +68,7 @@ const Dashboard: React.FC<DashboardProps> = ({ sales }) => {
         </div>
       </header>
 
+      {/* Stats Globais */}
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-zinc-900 border border-zinc-800 p-4 rounded-[24px] space-y-1">
           <DollarSign size={16} className="text-purple-500 mb-2" />
@@ -70,6 +95,40 @@ const Dashboard: React.FC<DashboardProps> = ({ sales }) => {
         </div>
       </div>
 
+      {/* Desempenho da Equipe (Apenas para Admin/Gerente que recebem todas as vendas) */}
+      {operatorStats.length > 0 && (
+        <div className="space-y-4">
+          <h3 className="font-black text-[10px] uppercase tracking-widest text-zinc-500 px-1">Desempenho da Equipe</h3>
+          <div className="space-y-2">
+            {operatorStats.map((op, idx) => (
+              <div key={idx} className="bg-zinc-900 border border-zinc-800 p-4 rounded-3xl">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-8 h-8 bg-purple-600/20 rounded-full flex items-center justify-center text-purple-400">
+                    <User size={14} />
+                  </div>
+                  <h4 className="text-sm font-black text-white">{op.name}</h4>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="text-center p-2 bg-zinc-950 rounded-xl border border-zinc-800">
+                    <p className="text-[8px] font-black text-zinc-500 uppercase">Vendas</p>
+                    <p className="text-sm font-black text-white">{op.vendas}</p>
+                  </div>
+                  <div className="text-center p-2 bg-zinc-950 rounded-xl border border-zinc-800">
+                    <p className="text-[8px] font-black text-zinc-500 uppercase">Itens</p>
+                    <p className="text-sm font-black text-white">{op.itens}</p>
+                  </div>
+                  <div className="text-center p-2 bg-zinc-950 rounded-xl border border-zinc-800">
+                    <p className="text-[8px] font-black text-zinc-500 uppercase">Média</p>
+                    <p className="text-xs font-black text-purple-400">R${(op.totalRevenue / op.vendas).toFixed(2)}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Fluxo de Caixa */}
       <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-[32px]">
         <h3 className="font-black text-[10px] uppercase tracking-widest text-zinc-500 mb-6">Fluxo de Caixa</h3>
         <div className="h-40 w-full">
