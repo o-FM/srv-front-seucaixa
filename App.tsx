@@ -21,7 +21,15 @@ const App: React.FC = () => {
     return saved ? JSON.parse(saved) : null;
   });
 
-  const [currentView, setCurrentView] = useState<View>('dashboard');
+  // Define a visualização inicial baseada no cargo do usuário salvo
+  const [currentView, setCurrentView] = useState<View>(() => {
+    const saved = localStorage.getItem('logged_user');
+    if (saved) {
+      const u = JSON.parse(saved);
+      return u.role === 'Operador' ? 'sales' : 'dashboard';
+    }
+    return 'dashboard';
+  });
   
   const [users, setUsers] = useState<User[]>(() => {
     const saved = localStorage.getItem('pdv_users');
@@ -49,6 +57,8 @@ const App: React.FC = () => {
     if (found) {
       setCurrentUser(found);
       localStorage.setItem('logged_user', JSON.stringify(found));
+      // Redireciona Operador para Vendas, outros para Dashboard
+      setCurrentView(found.role === 'Operador' ? 'sales' : 'dashboard');
       return true;
     }
     return false;
@@ -102,6 +112,11 @@ const App: React.FC = () => {
   }
 
   const renderView = () => {
+    // Bloqueio de segurança: Se um operador tentar ver o dashboard, redireciona para vendas
+    if (currentView === 'dashboard' && currentUser.role === 'Operador') {
+      return <SalesRegistration products={products} onCompleteSale={handleCompleteSale} />;
+    }
+
     switch (currentView) {
       case 'dashboard': return <Dashboard sales={filteredSales} />;
       case 'sales': return <SalesRegistration products={products} onCompleteSale={handleCompleteSale} />;
@@ -152,7 +167,8 @@ const App: React.FC = () => {
   };
 
   const menuItems = [
-    { id: 'dashboard', label: 'Início', icon: <LayoutDashboard size={20} />, roles: ['Admin', 'Gerente', 'Operador'] },
+    // Dashboard (Início) agora visível apenas para Admin e Gerente
+    { id: 'dashboard', label: 'Início', icon: <LayoutDashboard size={20} />, roles: ['Admin', 'Gerente'] },
     { id: 'sales', label: 'Venda', icon: <ShoppingCart size={20} />, roles: ['Admin', 'Gerente', 'Operador'] },
     { id: 'products', label: 'Estoque', icon: <Package size={20} />, roles: ['Admin', 'Gerente', 'Operador'] },
     { id: 'history', label: 'Histórico', icon: <HistoryIcon size={20} />, roles: ['Admin', 'Gerente', 'Operador'] },
