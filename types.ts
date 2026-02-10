@@ -1,4 +1,14 @@
 
+export type Role = 'Admin' | 'Gerente' | 'Operador';
+
+export interface User {
+  id: string;
+  username: string;
+  password?: string;
+  name: string;
+  role: Role;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -26,9 +36,10 @@ export interface Sale {
   items: CartItem[];
   total: number;
   payments: PaymentEntry[];
-  paymentMethod: string; // Mantido para compatibilidade, agora será uma string resumida
+  paymentMethod: string;
   operator: string;
+  operatorId: string; // Adicionado para filtro de permissão
   status: 'Concluída' | 'Cancelada' | 'Pendente';
 }
 
-export type View = 'dashboard' | 'sales' | 'products' | 'history' | 'settings' | 'scanner';
+export type View = 'dashboard' | 'sales' | 'products' | 'history' | 'users' | 'settings';

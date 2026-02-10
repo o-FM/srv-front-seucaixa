@@ -108,6 +108,7 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
   };
 
   const finalizeSale = (allPayments: PaymentEntry[]) => {
+    // Adicionado operatorId para satisfazer a interface Sale exigida pelo TypeScript.
     const newSale: Sale = {
       id: Math.random().toString(36).substr(2, 9).toUpperCase(),
       date: new Date().toISOString(),
@@ -116,6 +117,7 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
       payments: allPayments,
       paymentMethod: allPayments.map(p => p.method).join(' + '),
       operator: 'JOÃO CAIXA',
+      operatorId: '', 
       status: 'Concluída'
     };
     
@@ -193,7 +195,6 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
               placeholder="Produto..." 
               className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4 pl-12 pr-4 text-sm font-medium focus:border-purple-600 outline-none transition-all"
               value={manualCode}
-              // Fixed: Changed setManualAmount to setManualCode
               onChange={(e) => setManualCode(e.target.value)}
               onKeyDown={(e) => {
                 if(e.key === 'Enter') {
