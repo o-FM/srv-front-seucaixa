@@ -1,0 +1,7 @@
+{
+  "name": "Mercado Online PDV Mobile",
+  "description": "A high-performance mobile point-of-sale system with barcode scanning, inventory management, and real-time sales reporting in a sleek dark purple theme.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
