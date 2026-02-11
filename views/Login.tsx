@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { User, Lock, ArrowRight, ShoppingCart } from 'lucide-react';
+import { User, Lock, ArrowRight, ShoppingCart, Terminal } from 'lucide-react';
 import { User as UserType } from '../types';
 
 interface LoginProps {
@@ -22,7 +22,13 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6 relative">
+      {/* Badge de Branch Develop */}
+      <div className="absolute top-8 flex items-center gap-2 px-3 py-1 bg-purple-600/10 border border-purple-500/30 rounded-full">
+        <Terminal size={12} className="text-purple-500" />
+        <span className="text-[10px] font-black text-purple-400 uppercase tracking-widest">Branch: develop</span>
+      </div>
+
       <div className="w-full max-w-sm space-y-8 animate-in fade-in zoom-in duration-500">
         <div className="text-center space-y-2">
           <div className="w-20 h-20 bg-purple-600/20 rounded-[32px] flex items-center justify-center mx-auto border border-purple-500/30 mb-4 shadow-2xl shadow-purple-600/20">
@@ -77,7 +83,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
         <div className="text-center pt-8">
           <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">
-            V1.5 • MERCADO ONLINE PDV
+            V1.6-BETA • BRANCH DEVELOP
           </p>
         </div>
       </div>

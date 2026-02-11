@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, Sale, Product, User, Role } from './types';
-import { NAV_ITEMS, INITIAL_PRODUCTS } from './constants';
+import { INITIAL_PRODUCTS } from './constants';
 import Dashboard from './views/Dashboard';
 import SalesRegistration from './views/SalesRegistration';
 import ProductManagement from './views/ProductManagement';
@@ -75,9 +75,7 @@ const App: React.FC = () => {
       operator: currentUser?.name || 'Sistema',
       operatorId: currentUser?.id || 'sys'
     };
-    
     setSalesHistory(prev => [enrichedSale, ...prev]);
-    
     setProducts(prevProducts => prevProducts.map(p => {
       const soldItem = sale.items.find(item => item.id === p.id);
       if (soldItem) return { ...p, stock: Math.max(0, p.stock - soldItem.quantity) };
@@ -85,115 +83,53 @@ const App: React.FC = () => {
     }));
   };
 
-  const handleSaveProduct = (product: Product) => {
-    setProducts(prev => {
-      const exists = prev.find(p => p.id === product.id);
-      if (exists) return prev.map(p => p.id === product.id ? product : p);
-      return [...prev, product];
-    });
-  };
-
-  const handleSaveUser = (user: User) => {
-    setUsers(prev => {
-      const exists = prev.find(u => u.id === user.id);
-      if (exists) return prev.map(u => u.id === user.id ? user : u);
-      return [...prev, user];
-    });
-  };
-
-  const filteredSales = currentUser?.role === 'Operador' 
-    ? salesHistory.filter(s => s.operatorId === currentUser.id)
-    : salesHistory;
-
-  if (!currentUser) {
-    return <Login onLogin={handleLogin} />;
-  }
+  if (!currentUser) return <Login onLogin={handleLogin} />;
 
   const renderView = () => {
-    if (currentView === 'dashboard' && currentUser.role === 'Operador') {
-      return <SalesRegistration products={products} onCompleteSale={handleCompleteSale} />;
-    }
-
     switch (currentView) {
-      case 'dashboard': return <Dashboard sales={filteredSales} />;
+      case 'dashboard': return <Dashboard sales={salesHistory} />;
       case 'sales': return <SalesRegistration products={products} onCompleteSale={handleCompleteSale} />;
-      case 'products': return (
-        <ProductManagement 
-          products={products} 
-          onSave={handleSaveProduct} 
-          onDelete={(id) => confirm("Excluir?") && setProducts(p => p.filter(i => i.id !== id))} 
-        />
-      );
-      case 'history': return <History sales={filteredSales} />;
-      case 'users': 
-        if (currentUser.role !== 'Admin') return <Dashboard sales={filteredSales} />;
-        return <UserManagement users={users} onSaveUser={handleSaveUser} onDeleteUser={(id) => setUsers(u => u.filter(i => i.id !== id))} />;
-      case 'settings': return (
-        <div className="h-full overflow-y-auto p-8 pb-32 space-y-6">
-          <header className="space-y-2">
-            <h2 className="text-2xl font-black">Configurações</h2>
-            <div className="p-4 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center gap-4">
-               <div className="w-12 h-12 bg-purple-600/20 rounded-full flex items-center justify-center text-purple-500 font-black">
-                  {currentUser.name.substring(0, 1)}
-               </div>
-               <div>
-                 <p className="font-bold text-white leading-none">{currentUser.name}</p>
-                 <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">{currentUser.role}</p>
-               </div>
-            </div>
-          </header>
-          
-          <div className="space-y-3">
-             <button onClick={handleLogout} className="w-full py-5 bg-red-600/10 text-red-500 rounded-2xl font-black border border-red-500/20 active:scale-95 transition-all">
-                SAIR DA CONTA
-             </button>
-             
-             {currentUser.role === 'Admin' && (
-                <button 
-                   onClick={() => confirm("Deseja resetar TUDO?") && (localStorage.clear(), window.location.reload())}
-                   className="w-full py-5 bg-zinc-900 text-zinc-600 rounded-2xl font-black border border-zinc-800 text-xs uppercase"
-                >
-                  Resetar Fábrica (Limpar Tudo)
-                </button>
-             )}
-          </div>
-        </div>
-      );
-      default: return <Dashboard sales={filteredSales} />;
+      case 'products': return <ProductManagement products={products} onSave={(p) => setProducts(prev => prev.map(i => i.id === p.id ? p : i))} onDelete={(id) => setProducts(p => p.filter(i => i.id !== id))} />;
+      case 'history': return <History sales={salesHistory} />;
+      case 'users': return <UserManagement users={users} onSaveUser={(u) => setUsers(prev => [...prev, u])} onDeleteUser={(id) => setUsers(u => u.filter(i => i.id !== id))} />;
+      case 'settings': return <div className="p-8 max-w-md mx-auto"><button onClick={handleLogout} className="w-full py-4 bg-red-600 rounded-2xl font-black shadow-lg shadow-red-900/20 active:scale-95 transition-all">SAIR DA CONTA</button></div>;
+      default: return <Dashboard sales={salesHistory} />;
     }
   };
 
   const menuItems = [
-    { id: 'dashboard', label: 'Início', icon: <LayoutDashboard size={20} />, roles: ['Admin', 'Gerente'] },
-    { id: 'sales', label: 'Venda', icon: <ShoppingCart size={20} />, roles: ['Admin', 'Gerente', 'Operador'] },
-    { id: 'products', label: 'Estoque', icon: <Package size={20} />, roles: ['Admin', 'Gerente', 'Operador'] },
-    { id: 'history', label: 'Histórico', icon: <HistoryIcon size={20} />, roles: ['Admin', 'Gerente', 'Operador'] },
-    { id: 'users', label: 'Equipe', icon: <Users size={20} />, roles: ['Admin'] },
-    { id: 'settings', label: 'Conta', icon: <Settings size={20} />, roles: ['Admin', 'Gerente', 'Operador'] },
+    { id: 'dashboard', label: 'INÍCIO', icon: <LayoutDashboard size={20} />, roles: ['Admin', 'Gerente'] },
+    { id: 'sales', label: 'VENDA', icon: <ShoppingCart size={20} />, roles: ['Admin', 'Gerente', 'Operador'] },
+    { id: 'products', label: 'ESTOQUE', icon: <Package size={20} />, roles: ['Admin', 'Gerente', 'Operador'] },
+    { id: 'history', label: 'HISTÓRICO', icon: <HistoryIcon size={20} />, roles: ['Admin', 'Gerente', 'Operador'] },
+    { id: 'users', label: 'EQUIPE', icon: <Users size={20} />, roles: ['Admin'] },
+    { id: 'settings', label: 'CONTA', icon: <Settings size={20} />, roles: ['Admin', 'Gerente', 'Operador'] },
   ];
 
   return (
-    <div className="h-full max-w-md mx-auto bg-zinc-950 text-zinc-100 flex flex-col overflow-hidden relative border-x border-zinc-900 shadow-2xl">
-      <main className="flex-1 overflow-hidden">{renderView()}</main>
+    <div className="h-full flex flex-col bg-zinc-950 overflow-hidden">
+      <main className="flex-1 overflow-hidden relative w-full max-w-5xl mx-auto">
+        {renderView()}
+      </main>
 
-      <nav className="shrink-0 w-full bg-zinc-950/80 backdrop-blur-xl border-t border-zinc-900/50 px-4 py-3 pb-8 flex justify-around items-center z-40">
-        {menuItems.filter(item => item.roles.includes(currentUser.role)).map((item) => (
-          <button
-            key={item.id}
-            onClick={() => setCurrentView(item.id as View)}
-            className={`flex flex-col items-center gap-1 transition-all ${
-              currentView === item.id ? 'text-purple-400 transform scale-105' : 'text-zinc-600'
-            }`}
-          >
-            <div className={`p-1.5 rounded-xl ${currentView === item.id ? 'bg-purple-500/10' : ''}`}>
-               {item.icon}
-            </div>
-            <span className="text-[8px] font-black tracking-tight uppercase">{item.label}</span>
-          </button>
-        ))}
+      <nav className="shrink-0 bg-zinc-900/80 backdrop-blur-2xl border-t border-zinc-800/50 flex justify-around items-center px-4 py-3 md:py-4 pb-[calc(env(safe-area-inset-bottom)+12px)] z-50">
+        <div className="w-full max-w-2xl mx-auto flex justify-around">
+          {menuItems.filter(item => item.roles.includes(currentUser.role)).map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setCurrentView(item.id as View)}
+              className={`flex flex-col items-center gap-1 transition-all flex-1 min-w-[60px] ${
+                currentView === item.id ? 'text-purple-400' : 'text-zinc-500 hover:text-zinc-300'
+              }`}
+            >
+              <div className={`p-2 rounded-xl transition-all ${currentView === item.id ? 'bg-purple-500/10 scale-110' : ''}`}>
+                {item.icon}
+              </div>
+              <span className="text-[7px] md:text-[9px] font-black tracking-widest uppercase">{item.label}</span>
+            </button>
+          ))}
+        </div>
       </nav>
-      
-      {/* Prompt de Instalação */}
       <InstallPrompt />
     </div>
   );
