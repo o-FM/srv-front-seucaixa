@@ -7,10 +7,10 @@ import Scanner from '../components/Scanner';
 interface ProductManagementProps {
   products: Product[];
   onSave: (product: Product) => void;
-  onDelete: (id: string) => void;
+  onDelete: (barcode: string) => void;
 }
 
-const CATEGORIES = ['Grãos', 'Bebidas', 'Limpeza', 'Açougues', 'Doces', 'Higiene', 'Frios', 'Padaria'];
+const CATEGORIES = ['GRAOS', 'BEBIDAS', 'LIMPEZA', 'AÇOUGUE', 'DOCES', 'HIGIENE', 'FRIOS', 'PADARIA'];
 
 const ProductManagement: React.FC<ProductManagementProps> = ({ products, onSave, onDelete }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -18,8 +18,10 @@ const ProductManagement: React.FC<ProductManagementProps> = ({ products, onSave,
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Partial<Product> | null>(null);
 
+  console.log("Produtos recebidos:", products);
+
   const filtered = products.filter(p => 
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    p.productName.toLowerCase().includes(searchTerm.toLowerCase()) || 
     p.barcode.includes(searchTerm)
   );
 
@@ -117,8 +119,8 @@ const ProductManagement: React.FC<ProductManagementProps> = ({ products, onSave,
                 type="text"
                 placeholder="Ex: Arroz Tio João 1kg"
                 className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-5 px-5 text-sm focus:border-purple-500 outline-none transition-all"
-                value={editingProduct.name}
-                onChange={e => setEditingProduct({ ...editingProduct, name: e.target.value })}
+                value={editingProduct.productName}
+                onChange={e => setEditingProduct({ ...editingProduct, productName: e.target.value })}
               />
             </div>
 
@@ -133,8 +135,8 @@ const ProductManagement: React.FC<ProductManagementProps> = ({ products, onSave,
                     step="0.01"
                     placeholder="0,00"
                     className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-5 pl-10 pr-4 text-sm focus:border-purple-500 outline-none transition-all"
-                    value={editingProduct.price || ''}
-                    onChange={e => setEditingProduct({ ...editingProduct, price: parseFloat(e.target.value) })}
+                    value={editingProduct.salePrice || ''}
+                    onChange={e => setEditingProduct({ ...editingProduct, salePrice: parseFloat(e.target.value) })}
                   />
                 </div>
               </div>
@@ -145,8 +147,8 @@ const ProductManagement: React.FC<ProductManagementProps> = ({ products, onSave,
                   type="number"
                   placeholder="0"
                   className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-5 px-5 text-sm focus:border-purple-500 outline-none transition-all"
-                  value={editingProduct.stock || ''}
-                  onChange={e => setEditingProduct({ ...editingProduct, stock: parseInt(e.target.value) })}
+                  value={editingProduct.currentStock || ''}
+                  onChange={e => setEditingProduct({ ...editingProduct, currentStock: parseInt(e.target.value) })}
                 />
               </div>
             </div>
@@ -171,12 +173,12 @@ const ProductManagement: React.FC<ProductManagementProps> = ({ products, onSave,
               </div>
             </div>
 
-            {editingProduct.id && products.find(p => p.id === editingProduct.id) && (
+            {editingProduct.barcode && products.find(p => p.barcode === editingProduct.barcode) && (
                <button 
                 type="button"
                 onClick={() => {
                   if(confirm("Deseja realmente excluir este produto?")) {
-                    onDelete(editingProduct.id!);
+                    onDelete(editingProduct.barcode!);
                     setIsFormOpen(false);
                   }
                 }}
@@ -236,11 +238,10 @@ const ProductManagement: React.FC<ProductManagementProps> = ({ products, onSave,
                 onClick={() => handleEdit(product)}
                 className="bg-zinc-900/40 backdrop-blur-sm border border-zinc-800/60 rounded-[28px] p-4 flex gap-5 items-center active:scale-[0.98] transition-all hover:bg-zinc-900/80 cursor-pointer"
               >
-                <img src={product.image} className="w-16 h-16 rounded-2xl object-cover border border-zinc-800 bg-zinc-800 shrink-0" alt={product.name} />
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start mb-1 gap-2">
-                    <h4 className="font-bold text-sm md:text-base text-white truncate">{product.name}</h4>
-                    <span className="text-sm font-black text-purple-400 whitespace-nowrap">R$ {product.price.toFixed(2)}</span>
+                    <h4 className="font-bold text-sm md:text-base text-white truncate">{product.productName}</h4>
+                    <span className="text-sm font-black text-purple-400 whitespace-nowrap">R$ {product.salePrice.toFixed(2)}</span>
                   </div>
                   <p className="text-[10px] text-zinc-500 font-mono tracking-tighter mb-3 uppercase">{product.barcode}</p>
                   <div className="flex items-center gap-3">
@@ -249,7 +250,7 @@ const ProductManagement: React.FC<ProductManagementProps> = ({ products, onSave,
                       product.stock < 30 ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' : 
                       'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
                     }`}>
-                      Estoque: {product.stock}
+                      Estoque: {product.currentStock}
                     </div>
                     <span className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">{product.category}</span>
                   </div>

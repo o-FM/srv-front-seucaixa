@@ -4,9 +4,9 @@
   "short_name": "Seu Caixa",
   "description": "Sistema de PDV de alta performance para dispositivos móveis",
   "start_url": "/",
-  "display": "standalone",
-  "background_color": "#09090b",
-  "theme_color": "#7c3aed",
+  "display": "fullscreen",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "orientation": "portrait",
   "icons": [
     {

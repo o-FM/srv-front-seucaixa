@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, Sale, Product, User, Role } from './types';
-import { INITIAL_PRODUCTS } from './constants';
+// import { INITIAL_PRODUCTS } from './constants';
+import { getProducts, createProduct, deleteProduct } from "./services/productService";
 import Dashboard from './views/Dashboard';
 import SalesRegistration from './views/SalesRegistration';
 import ProductManagement from './views/ProductManagement';
@@ -36,15 +37,31 @@ const App: React.FC = () => {
     return saved ? JSON.parse(saved) : INITIAL_USERS;
   });
 
-  const [products, setProducts] = useState<Product[]>(() => {
-    const saved = localStorage.getItem('inventory_products');
-    return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
-  });
+  const [products, setProducts] = useState<Product[]>([]);
 
   const [salesHistory, setSalesHistory] = useState<Sale[]>(() => {
     const saved = localStorage.getItem('sales_history');
     return saved ? JSON.parse(saved) : [];
   });
+
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const data = await getProducts();
+        setProducts(data);
+      } catch (error) {
+        console.warn("API indisponível, usando localStorage");
+
+        const saved = localStorage.getItem('inventory_products');
+        if (saved) {
+          setProducts(JSON.parse(saved));
+        }
+      }
+    }
+
+    loadProducts();
+  }, []);
+
 
   useEffect(() => {
     localStorage.setItem('inventory_products', JSON.stringify(products));
@@ -77,7 +94,7 @@ const App: React.FC = () => {
     };
     setSalesHistory(prev => [enrichedSale, ...prev]);
     setProducts(prevProducts => prevProducts.map(p => {
-      const soldItem = sale.items.find(item => item.id === p.id);
+      const soldItem = sale.items.find(item => item.barcode === p.barcode);
       if (soldItem) return { ...p, stock: Math.max(0, p.stock - soldItem.quantity) };
       return p;
     }));
@@ -89,7 +106,37 @@ const App: React.FC = () => {
     switch (currentView) {
       case 'dashboard': return <Dashboard sales={salesHistory} />;
       case 'sales': return <SalesRegistration products={products} onCompleteSale={handleCompleteSale} />;
-      case 'products': return <ProductManagement products={products} onSave={(p) => setProducts(prev => prev.map(i => i.id === p.id ? p : i))} onDelete={(id) => setProducts(p => p.filter(i => i.id !== id))} />;
+      case 'products':
+        return (
+          <ProductManagement
+            products={products}
+            onSave={async (product) => {
+              try {
+                // if (product.id) {
+                //   await updateProduct(product);
+                // } else {
+                //   await createProduct(product);
+                // }
+
+                await createProduct(product);
+
+                const updated = await getProducts();
+                setProducts(updated);
+
+              } catch (error) {
+                console.error("Erro ao salvar produto:", error);
+              }
+            }}
+            onDelete={async (barcode) => {
+              try {
+                await deleteProduct(barcode);
+                setProducts(prev => prev.filter(p => p.barcode !== barcode));
+              } catch (error) {
+                console.error("Erro ao deletar produto:", error);
+              }
+            }}
+          />
+        );
       case 'history': return <History sales={salesHistory} />;
       case 'users': return <UserManagement users={users} onSaveUser={(u) => setUsers(prev => [...prev, u])} onDeleteUser={(id) => setUsers(u => u.filter(i => i.id !== id))} />;
       case 'settings': return <div className="p-8 max-w-md mx-auto"><button onClick={handleLogout} className="w-full py-4 bg-red-600 rounded-2xl font-black shadow-lg shadow-red-900/20 active:scale-95 transition-all">SAIR DA CONTA</button></div>;

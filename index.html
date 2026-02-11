@@ -1,15 +1,17 @@
 
 <!DOCTYPE html>
-<html lang="pt-BR" class="h-full overflow-hidden">
+<html lang="pt-BR" class="h-full overflow-hidden bg-black">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Seu Caixa</title>
+    <title>Mercado Online PDV</title>
     
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#09090b">
+    <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <!-- black-translucent faz os ícones do sistema (hora/bateria) flutuarem sobre o app -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="PDV Móvel">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3081/3081840.png">
@@ -22,12 +24,13 @@
         :root {
             --app-height: 100dvh;
         }
+        /* html e body com bg preto absoluto para sumir com a barra de status */
         html, body {
             height: var(--app-height);
             width: 100%;
             overflow: hidden;
-            position: fixed; /* Impede scroll do body no iOS */
-            background-color: #000;
+            position: fixed;
+            background-color: #000000;
             margin: 0;
             padding: 0;
             -webkit-user-select: none;
@@ -36,10 +39,12 @@
         }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #09090b;
             color: #fafafa;
             -webkit-tap-highlight-color: transparent;
-            /* Suporte a Safe Areas do iOS/Android */
+            /* 
+               Padding dinâmico: o background do body preenche a tela toda,
+               mas o conteúdo respeita as 'safe areas' (notch e barra inferior).
+            */
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
         #root {
@@ -48,21 +53,29 @@
             flex-direction: column;
             overflow: hidden;
         }
-        /* Ajuste de formulários para evitar zoom no iOS */
         input, select, textarea {
             font-size: 16px !important;
             -webkit-user-select: text;
             user-select: text;
         }
-        /* Scrollbar minimalista */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
     </style>
-<link rel="stylesheet" href="/index.css">
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "recharts": "https://esm.sh/recharts@^3.7.0",
+    "html5-qrcode": "https://esm.sh/html5-qrcode@^2.3.8"
+  }
+}
+</script>
 </head>
 <body class="antialiased">
     <div id="root"></div>
-<script type="module" src="/index.tsx"></script>
 </body>
 </html>

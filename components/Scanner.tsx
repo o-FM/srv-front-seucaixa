@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { X, Zap, ZapOff, Loader2, Keyboard } from 'lucide-react';
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
@@ -77,9 +76,9 @@ const Scanner: React.FC<ScannerProps> = ({ onScan, onClose }) => {
     if (scannerRef.current && scannerRef.current.isScanning) {
       try {
         const nextTorch = !torch;
-        // @ts-ignore
+        // Fix: Use 'as any' to allow 'torch' property which is not standard in MediaTrackConstraintSet but supported by some browsers
         await scannerRef.current.applyVideoConstraints({
-          advanced: [{ torch: nextTorch }]
+          advanced: [{ torch: nextTorch } as any]
         });
         setTorch(nextTorch);
       } catch (e) {
