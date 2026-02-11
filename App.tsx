@@ -8,6 +8,7 @@ import ProductManagement from './views/ProductManagement';
 import History from './views/History';
 import UserManagement from './views/UserManagement';
 import Login from './views/Login';
+import InstallPrompt from './components/InstallPrompt';
 import { LayoutDashboard, ShoppingCart, Package, History as HistoryIcon, Users, Settings } from 'lucide-react';
 
 const INITIAL_USERS: User[] = [
@@ -21,7 +22,6 @@ const App: React.FC = () => {
     return saved ? JSON.parse(saved) : null;
   });
 
-  // Define a visualização inicial baseada no cargo do usuário salvo
   const [currentView, setCurrentView] = useState<View>(() => {
     const saved = localStorage.getItem('logged_user');
     if (saved) {
@@ -57,7 +57,6 @@ const App: React.FC = () => {
     if (found) {
       setCurrentUser(found);
       localStorage.setItem('logged_user', JSON.stringify(found));
-      // Redireciona Operador para Vendas, outros para Dashboard
       setCurrentView(found.role === 'Operador' ? 'sales' : 'dashboard');
       return true;
     }
@@ -102,7 +101,6 @@ const App: React.FC = () => {
     });
   };
 
-  // Filtrar vendas com base no role
   const filteredSales = currentUser?.role === 'Operador' 
     ? salesHistory.filter(s => s.operatorId === currentUser.id)
     : salesHistory;
@@ -112,7 +110,6 @@ const App: React.FC = () => {
   }
 
   const renderView = () => {
-    // Bloqueio de segurança: Se um operador tentar ver o dashboard, redireciona para vendas
     if (currentView === 'dashboard' && currentUser.role === 'Operador') {
       return <SalesRegistration products={products} onCompleteSale={handleCompleteSale} />;
     }
@@ -167,7 +164,6 @@ const App: React.FC = () => {
   };
 
   const menuItems = [
-    // Dashboard (Início) agora visível apenas para Admin e Gerente
     { id: 'dashboard', label: 'Início', icon: <LayoutDashboard size={20} />, roles: ['Admin', 'Gerente'] },
     { id: 'sales', label: 'Venda', icon: <ShoppingCart size={20} />, roles: ['Admin', 'Gerente', 'Operador'] },
     { id: 'products', label: 'Estoque', icon: <Package size={20} />, roles: ['Admin', 'Gerente', 'Operador'] },
@@ -196,6 +192,9 @@ const App: React.FC = () => {
           </button>
         ))}
       </nav>
+      
+      {/* Prompt de Instalação */}
+      <InstallPrompt />
     </div>
   );
 };
