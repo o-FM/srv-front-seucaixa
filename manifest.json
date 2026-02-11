@@ -1,7 +1,7 @@
 
 {
-  "name": "Mercado Online PDV",
-  "short_name": "PDV Móvel",
+  "name": "Seu Caixa - Sistema de PDV para Dispositivos Móveis",
+  "short_name": "Seu Caixa",
   "description": "Sistema de PDV de alta performance para dispositivos móveis",
   "start_url": "/",
   "display": "standalone",
