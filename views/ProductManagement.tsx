@@ -65,7 +65,7 @@ const ProductManagement: React.FC<ProductManagementProps> = ({ products, onSave,
   if (isFormOpen && editingProduct) {
     return (
       <div className="fixed inset-0 z-50 bg-black flex flex-col animate-in fade-in duration-300">
-        <header className="p-4 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between">
+        <header className="shrink-0 p-4 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button onClick={() => setIsFormOpen(false)} className="p-2 text-zinc-400">
               <ArrowLeft size={24} />
@@ -83,8 +83,7 @@ const ProductManagement: React.FC<ProductManagementProps> = ({ products, onSave,
           </button>
         </header>
 
-        <form id="product-form" onSubmit={handleSave} className="flex-1 overflow-y-auto p-6 space-y-6">
-          {/* Código de Barras primeiro */}
+        <form id="product-form" onSubmit={handleSave} className="flex-1 overflow-y-auto p-6 space-y-6 pb-20">
           <div className="space-y-2">
             <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Código de Barras</label>
             <div className="flex gap-2">
@@ -110,7 +109,6 @@ const ProductManagement: React.FC<ProductManagementProps> = ({ products, onSave,
             </div>
           </div>
 
-          {/* Nome do Produto depois */}
           <div className="space-y-2">
             <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Nome do Produto</label>
             <input 
@@ -190,35 +188,37 @@ const ProductManagement: React.FC<ProductManagementProps> = ({ products, onSave,
   }
 
   return (
-    <div className="p-4 space-y-6 pb-24 min-h-screen bg-black">
-      <header className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-black tracking-tight">Estoque</h1>
-          <p className="text-zinc-500 text-sm font-medium">{products.length} itens no catálogo</p>
+    <div className="h-full flex flex-col bg-black overflow-hidden">
+      <header className="shrink-0 p-4 space-y-4">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-black tracking-tight">Estoque</h1>
+            <p className="text-zinc-500 text-sm font-medium">{products.length} itens no catálogo</p>
+          </div>
+          <button 
+            onClick={handleAdd}
+            className="bg-purple-600 p-4 rounded-2xl shadow-lg shadow-purple-600/20 active:scale-90 transition-all text-white"
+          >
+            <Plus size={24} strokeWidth={3} />
+          </button>
         </div>
-        <button 
-          onClick={handleAdd}
-          className="bg-purple-600 p-4 rounded-2xl shadow-lg shadow-purple-600/20 active:scale-90 transition-all text-white"
-        >
-          <Plus size={24} strokeWidth={3} />
-        </button>
+
+        <div className="relative group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-purple-500 transition-colors" size={18} />
+          <input 
+            type="text"
+            placeholder="Buscar produto ou código..."
+            className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all shadow-lg"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
       </header>
 
-      <div className="relative group">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-purple-500 transition-colors" size={18} />
-        <input 
-          type="text"
-          placeholder="Buscar produto ou código..."
-          className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all shadow-lg"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
-
-      <div className="space-y-3">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 pb-32">
         {filtered.length === 0 ? (
-          <div className="py-20 text-center space-y-4 opacity-50">
-             <div className="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mx-auto border border-zinc-800">
+          <div className="h-full flex flex-col items-center justify-center space-y-4 opacity-50">
+             <div className="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center border border-zinc-800">
                 <Barcode size={32} className="text-zinc-600" />
              </div>
              <p className="text-sm font-medium">Nenhum produto encontrado</p>

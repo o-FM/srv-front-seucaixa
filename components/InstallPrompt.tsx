@@ -17,8 +17,9 @@ const InstallPrompt: React.FC = () => {
 
     // 2. Detectar Plataforma
     const ua = window.navigator.userAgent;
-    const isIos = /iPhone|iPad|iPod/.test(ua);
-    const isAndroid = /Android/.test(ua);
+    // Usando new RegExp para evitar SyntaxError: Invalid regular expression flags em alguns ambientes
+    const isIos = new RegExp('iPhone|iPad|iPod').test(ua);
+    const isAndroid = new RegExp('Android').test(ua);
 
     if (isIos) setPlatform('ios');
     else if (isAndroid) setPlatform('android');

@@ -35,8 +35,8 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onSaveUser, onDe
   };
 
   return (
-    <div className="p-4 space-y-6 pb-24 min-h-screen bg-black">
-      <header className="flex justify-between items-center">
+    <div className="h-full flex flex-col bg-black overflow-hidden">
+      <header className="shrink-0 p-4 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-black tracking-tight">Usuários</h1>
           <p className="text-zinc-500 text-sm font-medium">Controle de níveis de acesso</p>
@@ -49,7 +49,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onSaveUser, onDe
         </button>
       </header>
 
-      <div className="space-y-3">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 pb-32">
         {users.map(u => (
           <div key={u.id} className="bg-zinc-900 border border-zinc-800 p-4 rounded-2xl flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -85,8 +85,8 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onSaveUser, onDe
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl flex items-center justify-center p-6">
-          <div className="w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-[32px] p-8 space-y-6 animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl flex items-center justify-center p-6 overflow-hidden">
+          <div className="w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-[32px] p-8 space-y-6 animate-in zoom-in-95 duration-300 max-h-[90dvh] overflow-y-auto">
             <div className="flex justify-between items-center">
               <h3 className="text-xl font-black text-white">{editingUser.id ? 'Editar Usuário' : 'Novo Usuário'}</h3>
               <button onClick={() => setIsModalOpen(false)} className="text-zinc-500"><X size={24} /></button>

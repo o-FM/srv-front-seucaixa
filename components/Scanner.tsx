@@ -38,14 +38,11 @@ const Scanner: React.FC<ScannerProps> = ({ onScan, onClose }) => {
       { facingMode: "environment" },
       config,
       (decodedText) => {
-        // Sucesso no Escaneamento
-        if (navigator.vibrate) navigator.vibrate(100); // Feedback vibratório
+        if (navigator.vibrate) navigator.vibrate(100);
         onScan(decodedText);
         stopScanner();
       },
-      (errorMessage) => {
-        // Ignorar erros de frames não detectados (comum no loop)
-      }
+      () => {}
     ).then(() => {
       setIsInitializing(false);
     }).catch((err) => {
@@ -80,7 +77,7 @@ const Scanner: React.FC<ScannerProps> = ({ onScan, onClose }) => {
     if (scannerRef.current && scannerRef.current.isScanning) {
       try {
         const nextTorch = !torch;
-        // @ts-ignore - applyVideoConstraints é suportado em muitos browsers móveis
+        // @ts-ignore
         await scannerRef.current.applyVideoConstraints({
           advanced: [{ torch: nextTorch }]
         });
@@ -93,11 +90,9 @@ const Scanner: React.FC<ScannerProps> = ({ onScan, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-black flex flex-col">
-      {/* Container da Câmera */}
       <div className="relative flex-1 bg-zinc-950 overflow-hidden">
         <div id={containerId} className="w-full h-full" />
         
-        {/* Camada Estilizada de Scanner (Overlay) */}
         {!error && (
           <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center">
             <div className="w-72 h-48 border-2 border-purple-500/50 rounded-3xl relative shadow-[0_0_100px_rgba(0,0,0,0.8)]">
@@ -105,9 +100,7 @@ const Scanner: React.FC<ScannerProps> = ({ onScan, onClose }) => {
                <div className="absolute -top-1 -right-1 w-8 h-8 border-t-4 border-r-4 border-purple-500 rounded-tr-2xl" />
                <div className="absolute -bottom-1 -left-1 w-8 h-8 border-b-4 border-l-4 border-purple-500 rounded-bl-2xl" />
                <div className="absolute -bottom-1 -right-1 w-8 h-8 border-b-4 border-r-4 border-purple-500 rounded-br-2xl" />
-               
-               {/* Linha Laser Animada */}
-               <div className="absolute top-0 left-0 w-full h-0.5 bg-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.8)] animate-[scan_2.5s_ease-in-out_infinite]" />
+               <div className="absolute top-0 left-0 w-full h-0.5 bg-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.8)] scanner-line" />
             </div>
             <p className="mt-8 text-white font-black text-[10px] tracking-[0.2em] uppercase bg-black/40 px-4 py-2 rounded-full backdrop-blur-md">
               Aponte para o código
@@ -115,7 +108,6 @@ const Scanner: React.FC<ScannerProps> = ({ onScan, onClose }) => {
           </div>
         )}
 
-        {/* Botões Superiores */}
         <div className="absolute top-10 left-6 right-6 flex justify-between items-center z-10">
           <button 
             onClick={onClose}
@@ -160,7 +152,6 @@ const Scanner: React.FC<ScannerProps> = ({ onScan, onClose }) => {
         )}
       </div>
       
-      {/* Área de Entrada Manual - Fixada na Base */}
       <div className="p-8 pb-12 bg-zinc-950 border-t border-zinc-900">
           <form onSubmit={handleManualSubmit} className="space-y-4 max-w-sm mx-auto">
             <div className="flex flex-col items-center gap-2 mb-2">
@@ -172,7 +163,7 @@ const Scanner: React.FC<ScannerProps> = ({ onScan, onClose }) => {
                 type="text" 
                 inputMode="numeric"
                 placeholder="Digite o código manualmente..." 
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl px-6 py-5 text-center text-lg font-mono tracking-widest text-white focus:border-purple-600 focus:ring-1 focus:ring-purple-600 outline-none transition-all"
+                className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl px-6 py-5 text-center text-lg font-mono tracking-widest text-white focus:border-purple-600 outline-none"
                 value={manualCode}
                 onChange={(e) => setManualCode(e.target.value)}
               />
@@ -181,8 +172,6 @@ const Scanner: React.FC<ScannerProps> = ({ onScan, onClose }) => {
                   type="submit"
                   className="absolute right-3 top-1/2 -translate-y-1/2 p-3 bg-purple-600 rounded-xl text-white shadow-lg animate-in fade-in zoom-in"
                 >
-                  <Loader2 size={20} className="hidden group-data-[loading=true]:block animate-spin" />
-                  <Loader2 className="hidden" /> {/* Placeholder */}
                   <CheckIcon />
                 </button>
               )}
@@ -194,6 +183,9 @@ const Scanner: React.FC<ScannerProps> = ({ onScan, onClose }) => {
         @keyframes scan {
           0%, 100% { top: 0%; opacity: 0.3; }
           50% { top: 100%; opacity: 1; }
+        }
+        .scanner-line {
+          animation: scan 2.5s ease-in-out infinite;
         }
         #reader { border: none !important; }
         #reader video { 
