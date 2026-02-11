@@ -106,13 +106,44 @@ const App: React.FC = () => {
     { id: 'settings', label: 'CONTA', icon: <Settings size={20} />, roles: ['Admin', 'Gerente', 'Operador'] },
   ];
 
+  // return (
+  //   <div className="h-full flex flex-col bg-zinc-950 overflow-hidden">
+  //     <main className="flex-1 overflow-hidden relative w-full max-w-5xl mx-auto">
+  //       {renderView()}
+  //     </main>
+
+  //     <nav className="shrink-0 bg-zinc-900/80 backdrop-blur-2xl border-t border-zinc-800/50 flex justify-around items-center px-4 py-3 md:py-4 pb-[calc(env(safe-area-inset-bottom)+12px)] z-50">
+  //       <div className="w-full max-w-2xl mx-auto flex justify-around">
+  //         {menuItems.filter(item => item.roles.includes(currentUser.role)).map((item) => (
+  //           <button
+  //             key={item.id}
+  //             onClick={() => setCurrentView(item.id as View)}
+  //             className={`flex flex-col items-center gap-1 transition-all flex-1 min-w-[60px] ${
+  //               currentView === item.id ? 'text-purple-400' : 'text-zinc-500 hover:text-zinc-300'
+  //             }`}
+  //           >
+  //             <div className={`p-2 rounded-xl transition-all ${currentView === item.id ? 'bg-purple-500/10 scale-110' : ''}`}>
+  //               {item.icon}
+  //             </div>
+  //             <span className="text-[7px] md:text-[9px] font-black tracking-widest uppercase">{item.label}</span>
+  //           </button>
+  //         ))}
+  //       </div>
+  //     </nav>
+  //     <InstallPrompt />
+  //   </div>
+  // );
+
   return (
-    <div className="h-full flex flex-col bg-zinc-950 overflow-hidden">
-      <main className="flex-1 overflow-hidden relative w-full max-w-5xl mx-auto">
+    <div className="min-h-screen w-full max-w-full mx-auto bg-zinc-950 text-zinc-100 flex flex-col
+                     sm:max-w-sm md:max-w-2xl lg:max-w-4xl">
+      <main className="flex-1 overflow-x-hidden overflow-y-auto">
         {renderView()}
       </main>
 
-      <nav className="shrink-0 bg-zinc-900/80 backdrop-blur-2xl border-t border-zinc-800/50 flex justify-around items-center px-4 py-3 md:py-4 pb-[calc(env(safe-area-inset-bottom)+12px)] z-50">
+      <nav className="fixed bottom-0 left-0 right-0 w-full max-w-full sm:max-w-sm md:max-w-2xl lg:max-w-4xl
+                       bg-zinc-950/80 backdrop-blur-xl border-t border-zinc-900/50 px-4 py-3 
+                       flex justify-around items-center z-40">
         <div className="w-full max-w-2xl mx-auto flex justify-around">
           {menuItems.filter(item => item.roles.includes(currentUser.role)).map((item) => (
             <button
