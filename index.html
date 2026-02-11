@@ -1,16 +1,17 @@
+
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="h-full overflow-hidden">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Seu Caixa !!</title>
+    <title>Mercado Online PDV</title>
     
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#09090b">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Seu Caixa !!">
+    <meta name="apple-mobile-web-app-title" content="PDV Móvel">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3081/3081840.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -18,29 +19,60 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --app-height: 100dvh;
+        }
+        html, body {
+            height: var(--app-height);
+            width: 100%;
+            overflow: hidden;
+            position: fixed; /* Impede scroll do body no iOS */
+            background-color: #000;
+            margin: 0;
+            padding: 0;
+            -webkit-user-select: none;
+            user-select: none;
+            overscroll-behavior: none;
+        }
         body {
             font-family: 'Inter', sans-serif;
             background-color: #09090b;
             color: #fafafa;
             -webkit-tap-highlight-color: transparent;
-             /* Impede o scroll de "elástico" no topo e fundo do iOS */
-            overscroll-behavior-y: contain;
-            /* Garante que o app ocupe a tela inteira incluindo notches */
+            /* Suporte a Safe Areas do iOS/Android */
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
-        /* Scrollbar minimalista para não poluir o layout mobile */
-        ::-webkit-scrollbar { width: 3px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
-        
-        /* Prevenir zoom acidental em inputs no iOS */
+        #root {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        /* Ajuste de formulários para evitar zoom no iOS */
         input, select, textarea {
             font-size: 16px !important;
+            -webkit-user-select: text;
+            user-select: text;
         }
+        /* Scrollbar minimalista */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
     </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "recharts": "https://esm.sh/recharts@^3.7.0",
+    "html5-qrcode": "https://esm.sh/html5-qrcode@^2.3.8"
+  }
+}
+</script>
 </head>
 <body class="antialiased">
     <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
 </body>
 </html>

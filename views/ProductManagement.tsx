@@ -83,105 +83,109 @@ const ProductManagement: React.FC<ProductManagementProps> = ({ products, onSave,
           </button>
         </header>
 
-        <form id="product-form" onSubmit={handleSave} className="flex-1 overflow-y-auto p-6 space-y-6 pb-20">
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Código de Barras</label>
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Barcode className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600" size={20} />
-                <input 
-                  required
-                  autoFocus
-                  type="text"
-                  placeholder="Código EAN-13"
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4 pl-12 pr-4 text-sm font-mono focus:border-purple-500 outline-none transition-all"
-                  value={editingProduct.barcode}
-                  onChange={e => setEditingProduct({ ...editingProduct, barcode: e.target.value })}
-                />
-              </div>
-              <button 
-                type="button"
-                onClick={() => setIsScannerOpen(true)}
-                className="bg-zinc-800 border border-zinc-700 p-4 rounded-2xl text-purple-400 active:scale-90 transition-all"
-              >
-                <ScanLine size={24} />
-              </button>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Nome do Produto</label>
-            <input 
-              required
-              type="text"
-              placeholder="Ex: Arroz Tio João 1kg"
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4 px-5 text-sm focus:border-purple-500 outline-none transition-all"
-              value={editingProduct.name}
-              onChange={e => setEditingProduct({ ...editingProduct, name: e.target.value })}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
+        <form id="product-form" onSubmit={handleSave} className="flex-1 overflow-y-auto p-6 md:p-12 space-y-8 max-w-2xl mx-auto w-full pb-32">
+          <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Preço de Venda</label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 text-xs font-bold">R$</span>
+              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Código de Barras</label>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Barcode className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600" size={20} />
+                  <input 
+                    required
+                    autoFocus
+                    type="text"
+                    placeholder="Código EAN-13"
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-5 pl-12 pr-4 text-sm font-mono focus:border-purple-500 outline-none transition-all"
+                    value={editingProduct.barcode}
+                    onChange={e => setEditingProduct({ ...editingProduct, barcode: e.target.value })}
+                  />
+                </div>
+                <button 
+                  type="button"
+                  onClick={() => setIsScannerOpen(true)}
+                  className="bg-zinc-800 border border-zinc-700 p-4 rounded-2xl text-purple-400 active:scale-90 transition-all"
+                >
+                  <ScanLine size={24} />
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Nome do Produto</label>
+              <input 
+                required
+                type="text"
+                placeholder="Ex: Arroz Tio João 1kg"
+                className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-5 px-5 text-sm focus:border-purple-500 outline-none transition-all"
+                value={editingProduct.name}
+                onChange={e => setEditingProduct({ ...editingProduct, name: e.target.value })}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Preço de Venda</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 text-xs font-bold">R$</span>
+                  <input 
+                    required
+                    type="number"
+                    step="0.01"
+                    placeholder="0,00"
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-5 pl-10 pr-4 text-sm focus:border-purple-500 outline-none transition-all"
+                    value={editingProduct.price || ''}
+                    onChange={e => setEditingProduct({ ...editingProduct, price: parseFloat(e.target.value) })}
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Estoque Atual</label>
                 <input 
                   required
                   type="number"
-                  step="0.01"
-                  placeholder="0,00"
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4 pl-10 pr-4 text-sm focus:border-purple-500 outline-none transition-all"
-                  value={editingProduct.price || ''}
-                  onChange={e => setEditingProduct({ ...editingProduct, price: parseFloat(e.target.value) })}
+                  placeholder="0"
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-5 px-5 text-sm focus:border-purple-500 outline-none transition-all"
+                  value={editingProduct.stock || ''}
+                  onChange={e => setEditingProduct({ ...editingProduct, stock: parseInt(e.target.value) })}
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Estoque Atual</label>
-              <input 
-                required
-                type="number"
-                placeholder="0"
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4 px-5 text-sm focus:border-purple-500 outline-none transition-all"
-                value={editingProduct.stock || ''}
-                onChange={e => setEditingProduct({ ...editingProduct, stock: parseInt(e.target.value) })}
-              />
-            </div>
-          </div>
 
-          <div className="space-y-3">
-            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Categoria</label>
-            <div className="flex flex-wrap gap-2">
-              {CATEGORIES.map(cat => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => setEditingProduct({ ...editingProduct, category: cat })}
-                  className={`px-4 py-2 rounded-full text-[10px] font-bold border transition-all ${
-                    editingProduct.category === cat 
-                      ? 'bg-purple-600 border-purple-500 text-white' 
-                      : 'bg-zinc-900 border-zinc-800 text-zinc-500'
-                  }`}
-                >
-                  {cat.toUpperCase()}
-                </button>
-              ))}
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Categoria</label>
+              <div className="flex flex-wrap gap-2">
+                {CATEGORIES.map(cat => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setEditingProduct({ ...editingProduct, category: cat })}
+                    className={`px-4 py-2.5 rounded-full text-[10px] font-bold border transition-all ${
+                      editingProduct.category === cat 
+                        ? 'bg-purple-600 border-purple-500 text-white' 
+                        : 'bg-zinc-900 border-zinc-800 text-zinc-500'
+                    }`}
+                  >
+                    {cat.toUpperCase()}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {editingProduct.id && products.find(p => p.id === editingProduct.id) && (
-             <button 
-              type="button"
-              onClick={() => {
-                onDelete(editingProduct.id!);
-                setIsFormOpen(false);
-              }}
-              className="w-full py-4 text-red-500 text-xs font-bold uppercase tracking-widest border border-red-500/20 rounded-2xl mt-8"
-             >
-                Excluir Produto Permanentemente
-             </button>
-          )}
+            {editingProduct.id && products.find(p => p.id === editingProduct.id) && (
+               <button 
+                type="button"
+                onClick={() => {
+                  if(confirm("Deseja realmente excluir este produto?")) {
+                    onDelete(editingProduct.id!);
+                    setIsFormOpen(false);
+                  }
+                }}
+                className="w-full py-5 text-red-500 text-xs font-bold uppercase tracking-widest border border-red-500/20 rounded-2xl mt-12 bg-red-500/5 active:bg-red-500/10 transition-colors"
+               >
+                  Excluir Produto Permanentemente
+               </button>
+            )}
+          </div>
         </form>
       </div>
     );
@@ -189,68 +193,71 @@ const ProductManagement: React.FC<ProductManagementProps> = ({ products, onSave,
 
   return (
     <div className="h-full flex flex-col bg-black overflow-hidden">
-      <header className="shrink-0 p-4 space-y-4">
+      <header className="shrink-0 p-4 md:p-8 space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-black tracking-tight">Estoque</h1>
-            <p className="text-zinc-500 text-sm font-medium">{products.length} itens no catálogo</p>
+            <h1 className="text-2xl md:text-3xl font-black tracking-tight">Estoque</h1>
+            <p className="text-zinc-500 text-sm font-medium">{products.length} itens cadastrados</p>
           </div>
           <button 
             onClick={handleAdd}
-            className="bg-purple-600 p-4 rounded-2xl shadow-lg shadow-purple-600/20 active:scale-90 transition-all text-white"
+            className="bg-purple-600 p-4 md:p-5 rounded-2xl shadow-lg shadow-purple-600/20 active:scale-90 transition-all text-white"
           >
             <Plus size={24} strokeWidth={3} />
           </button>
         </div>
 
-        <div className="relative group">
+        <div className="relative group max-w-2xl">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-purple-500 transition-colors" size={18} />
           <input 
             type="text"
-            placeholder="Buscar produto ou código..."
-            className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all shadow-lg"
+            placeholder="Buscar produto pelo nome ou código..."
+            className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4 md:py-5 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all shadow-lg"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 pb-32">
+      <div className="flex-1 overflow-y-auto p-4 md:px-8 space-y-4 pb-40">
         {filtered.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center space-y-4 opacity-50">
-             <div className="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center border border-zinc-800">
-                <Barcode size={32} className="text-zinc-600" />
+          <div className="h-full flex flex-col items-center justify-center space-y-4 opacity-40">
+             <div className="w-20 h-20 bg-zinc-900 rounded-full flex items-center justify-center border border-zinc-800">
+                <Barcode size={40} className="text-zinc-600" />
              </div>
-             <p className="text-sm font-medium">Nenhum produto encontrado</p>
+             <p className="text-sm font-bold uppercase tracking-widest">Catálogo vazio ou sem resultados</p>
           </div>
         ) : (
-          filtered.map(product => (
-            <div 
-              key={product.id} 
-              onClick={() => handleEdit(product)}
-              className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-2xl p-4 flex gap-4 items-center active:scale-[0.98] transition-all hover:bg-zinc-900"
-            >
-              <img src={product.image} className="w-14 h-14 rounded-xl object-cover border border-zinc-800 bg-zinc-800" />
-              <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-start mb-1">
-                  <h4 className="font-bold text-sm truncate pr-2">{product.name}</h4>
-                  <span className="text-sm font-black text-purple-400 whitespace-nowrap">R$ {product.price.toFixed(2)}</span>
-                </div>
-                <p className="text-[10px] text-zinc-500 font-mono tracking-tighter mb-2">{product.barcode}</p>
-                <div className="flex items-center gap-2">
-                  <div className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter ${
-                    product.stock < 10 ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 
-                    product.stock < 30 ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20' : 
-                    'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
-                  }`}>
-                    Estoque: {product.stock}
+          /* Grid responsivo: 1 coluna no mobile, 2 colunas no desktop */
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {filtered.map(product => (
+              <div 
+                key={product.id} 
+                onClick={() => handleEdit(product)}
+                className="bg-zinc-900/40 backdrop-blur-sm border border-zinc-800/60 rounded-[28px] p-4 flex gap-5 items-center active:scale-[0.98] transition-all hover:bg-zinc-900/80 cursor-pointer"
+              >
+                <img src={product.image} className="w-16 h-16 rounded-2xl object-cover border border-zinc-800 bg-zinc-800 shrink-0" alt={product.name} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-start mb-1 gap-2">
+                    <h4 className="font-bold text-sm md:text-base text-white truncate">{product.name}</h4>
+                    <span className="text-sm font-black text-purple-400 whitespace-nowrap">R$ {product.price.toFixed(2)}</span>
                   </div>
-                  <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">{product.category}</span>
+                  <p className="text-[10px] text-zinc-500 font-mono tracking-tighter mb-3 uppercase">{product.barcode}</p>
+                  <div className="flex items-center gap-3">
+                    <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase border ${
+                      product.stock < 10 ? 'bg-red-500/10 text-red-500 border-red-500/20' : 
+                      product.stock < 30 ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' : 
+                      'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                    }`}>
+                      Estoque: {product.stock}
+                    </div>
+                    <span className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">{product.category}</span>
+                  </div>
                 </div>
+                <MoreVertical size={16} className="text-zinc-700 shrink-0" />
               </div>
-              <MoreVertical size={16} className="text-zinc-700" />
-            </div>
-          ))
+            ))}
+          </div>
         )}
       </div>
     </div>

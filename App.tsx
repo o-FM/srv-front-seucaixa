@@ -92,7 +92,7 @@ const App: React.FC = () => {
       case 'products': return <ProductManagement products={products} onSave={(p) => setProducts(prev => prev.map(i => i.id === p.id ? p : i))} onDelete={(id) => setProducts(p => p.filter(i => i.id !== id))} />;
       case 'history': return <History sales={salesHistory} />;
       case 'users': return <UserManagement users={users} onSaveUser={(u) => setUsers(prev => [...prev, u])} onDeleteUser={(id) => setUsers(u => u.filter(i => i.id !== id))} />;
-      case 'settings': return <div className="p-8"><button onClick={handleLogout} className="w-full py-4 bg-red-600 rounded-2xl font-black">SAIR</button></div>;
+      case 'settings': return <div className="p-8 max-w-md mx-auto"><button onClick={handleLogout} className="w-full py-4 bg-red-600 rounded-2xl font-black shadow-lg shadow-red-900/20 active:scale-95 transition-all">SAIR DA CONTA</button></div>;
       default: return <Dashboard sales={salesHistory} />;
     }
   };
@@ -108,27 +108,27 @@ const App: React.FC = () => {
 
   return (
     <div className="h-full flex flex-col bg-zinc-950 overflow-hidden">
-      {/* Container de visualização que ocupa todo o espaço exceto o menu */}
-      <main className="flex-1 overflow-hidden relative">
+      <main className="flex-1 overflow-hidden relative w-full max-w-5xl mx-auto">
         {renderView()}
       </main>
 
-      {/* Navegação fixa no rodapé */}
-      <nav className="shrink-0 bg-zinc-900/50 backdrop-blur-xl border-t border-zinc-800 flex justify-around items-center px-2 py-3 pb-safe">
-        {menuItems.filter(item => item.roles.includes(currentUser.role)).map((item) => (
-          <button
-            key={item.id}
-            onClick={() => setCurrentView(item.id as View)}
-            className={`flex flex-col items-center gap-1.5 transition-all flex-1 ${
-              currentView === item.id ? 'text-purple-400' : 'text-zinc-500'
-            }`}
-          >
-            <div className={`p-2 rounded-xl transition-colors ${currentView === item.id ? 'bg-purple-500/10' : ''}`}>
-              {item.icon}
-            </div>
-            <span className="text-[8px] font-black tracking-widest">{item.label}</span>
-          </button>
-        ))}
+      <nav className="shrink-0 bg-zinc-900/80 backdrop-blur-2xl border-t border-zinc-800/50 flex justify-around items-center px-4 py-3 md:py-4 pb-[calc(env(safe-area-inset-bottom)+12px)] z-50">
+        <div className="w-full max-w-2xl mx-auto flex justify-around">
+          {menuItems.filter(item => item.roles.includes(currentUser.role)).map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setCurrentView(item.id as View)}
+              className={`flex flex-col items-center gap-1 transition-all flex-1 min-w-[60px] ${
+                currentView === item.id ? 'text-purple-400' : 'text-zinc-500 hover:text-zinc-300'
+              }`}
+            >
+              <div className={`p-2 rounded-xl transition-all ${currentView === item.id ? 'bg-purple-500/10 scale-110' : ''}`}>
+                {item.icon}
+              </div>
+              <span className="text-[7px] md:text-[9px] font-black tracking-widest uppercase">{item.label}</span>
+            </button>
+          ))}
+        </div>
       </nav>
       <InstallPrompt />
     </div>
