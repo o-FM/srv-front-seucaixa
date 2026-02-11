@@ -129,7 +129,7 @@ const App: React.FC = () => {
         if (currentUser.role !== 'Admin') return <Dashboard sales={filteredSales} />;
         return <UserManagement users={users} onSaveUser={handleSaveUser} onDeleteUser={(id) => setUsers(u => u.filter(i => i.id !== id))} />;
       case 'settings': return (
-        <div className="p-8 space-y-6">
+        <div className="h-full overflow-y-auto p-8 pb-32 space-y-6">
           <header className="space-y-2">
             <h2 className="text-2xl font-black">Configurações</h2>
             <div className="p-4 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center gap-4">
@@ -173,10 +173,10 @@ const App: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen max-w-md mx-auto bg-zinc-950 text-zinc-100 flex flex-col">
-      <main className="flex-1 overflow-x-hidden">{renderView()}</main>
+    <div className="h-full max-w-md mx-auto bg-zinc-950 text-zinc-100 flex flex-col overflow-hidden relative border-x border-zinc-900 shadow-2xl">
+      <main className="flex-1 overflow-hidden">{renderView()}</main>
 
-      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-zinc-950/80 backdrop-blur-xl border-t border-zinc-900/50 px-4 py-3 flex justify-around items-center z-40">
+      <nav className="shrink-0 w-full bg-zinc-950/80 backdrop-blur-xl border-t border-zinc-900/50 px-4 py-3 pb-8 flex justify-around items-center z-40">
         {menuItems.filter(item => item.roles.includes(currentUser.role)).map((item) => (
           <button
             key={item.id}

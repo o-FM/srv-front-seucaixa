@@ -25,7 +25,7 @@ const Dashboard: React.FC<DashboardProps> = ({ sales }) => {
 
   const operatorStats = useMemo(() => {
     const grouped = sales.reduce((acc: Record<string, OperatorStat>, s) => {
-      const id = s.operatorId || s.operator; // Fallback para o nome se id não existir
+      const id = s.operatorId || s.operator;
       if (!acc[id]) {
         acc[id] = { name: s.operator, vendas: 0, itens: 0, totalRevenue: 0 };
       }
@@ -33,10 +33,8 @@ const Dashboard: React.FC<DashboardProps> = ({ sales }) => {
       acc[id].totalRevenue += s.total;
       acc[id].itens += s.items.reduce((sum, i) => sum + i.quantity, 0);
       return acc;
-    // Fix: Explicitly type the initial value of reduce to Record<string, OperatorStat>
     }, {} as Record<string, OperatorStat>);
 
-    // Fix: Cast Object.values results to OperatorStat[] to ensure correct property access in sort
     return (Object.values(grouped) as OperatorStat[]).sort((a, b) => b.totalRevenue - a.totalRevenue);
   }, [sales]);
 
@@ -57,7 +55,7 @@ const Dashboard: React.FC<DashboardProps> = ({ sales }) => {
   }, [sales]);
 
   return (
-    <div className="space-y-6 pb-24 p-4 animate-in fade-in duration-500">
+    <div className="h-full overflow-y-auto space-y-6 pb-24 p-4 animate-in fade-in duration-500">
       <header className="flex justify-between items-end">
         <div>
           <h1 className="text-2xl font-black tracking-tight">Dashboard</h1>
@@ -95,7 +93,39 @@ const Dashboard: React.FC<DashboardProps> = ({ sales }) => {
         </div>
       </div>
 
-      {/* Desempenho da Equipe (Apenas para Admin/Gerente que recebem todas as vendas) */}
+      {/* Fluxo de Caixa */}
+      <div className="bg-zinc-900 border border-zinc-800 p-5 rounded-[32px]">
+        <h3 className="font-black text-[10px] uppercase tracking-widest text-zinc-500 mb-4">Fluxo de Caixa</h3>
+        <div className="h-32 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={chartData}>
+              <defs>
+                <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#7c3aed" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#18181b" />
+              <XAxis dataKey="name" hide />
+              <YAxis hide />
+              <Tooltip 
+                contentStyle={{backgroundColor: '#09090b', border: '1px solid #27272a', borderRadius: '12px'}}
+                itemStyle={{color: '#a78bfa', fontWeight: '900'}}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="sales" 
+                stroke="#7c3aed" 
+                fillOpacity={1} 
+                fill="url(#colorSales)" 
+                strokeWidth={3}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Desempenho da Equipe */}
       {operatorStats.length > 0 && (
         <div className="space-y-4">
           <h3 className="font-black text-[10px] uppercase tracking-widest text-zinc-500 px-1">Desempenho da Equipe</h3>
@@ -127,38 +157,6 @@ const Dashboard: React.FC<DashboardProps> = ({ sales }) => {
           </div>
         </div>
       )}
-
-      {/* Fluxo de Caixa */}
-      <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-[32px]">
-        <h3 className="font-black text-[10px] uppercase tracking-widest text-zinc-500 mb-6">Fluxo de Caixa</h3>
-        <div className="h-40 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData}>
-              <defs>
-                <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#7c3aed" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#18181b" />
-              <XAxis dataKey="name" hide />
-              <YAxis hide />
-              <Tooltip 
-                contentStyle={{backgroundColor: '#09090b', border: '1px solid #27272a', borderRadius: '12px'}}
-                itemStyle={{color: '#a78bfa', fontWeight: '900'}}
-              />
-              <Area 
-                type="monotone" 
-                dataKey="sales" 
-                stroke="#7c3aed" 
-                fillOpacity={1} 
-                fill="url(#colorSales)" 
-                strokeWidth={3}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
 
       <div className="space-y-4">
         <h3 className="font-black text-[10px] uppercase tracking-widest text-zinc-500 px-1">Atividade Recente</h3>

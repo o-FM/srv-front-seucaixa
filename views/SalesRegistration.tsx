@@ -147,7 +147,6 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
     
     setIsGeneratingPDF(true);
     try {
-      // Captura o cupom como imagem
       const canvas = await html2canvas(receiptRef.current, {
         scale: 2,
         backgroundColor: '#ffffff',
@@ -158,7 +157,7 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
-        format: [80, (canvas.height * 80) / canvas.width] // Formato papel térmico 80mm
+        format: [80, (canvas.height * 80) / canvas.width]
       });
 
       const imgWidth = 80;
@@ -170,7 +169,6 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
       const fileName = `Cupom_${lastSale.id}.pdf`;
       const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
 
-      // Tenta usar a API de Compartilhamento Nativa
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
@@ -178,7 +176,6 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
           text: `Segue o cupom fiscal da sua compra no valor de R$ ${lastSale.total.toFixed(2)}`
         });
       } else {
-        // Fallback: Download do arquivo
         const link = document.createElement('a');
         link.href = URL.createObjectURL(pdfBlob);
         link.download = fileName;
@@ -238,8 +235,8 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
   );
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-black">
-      <header className="p-4 bg-zinc-950 border-b border-zinc-800 space-y-4">
+    <div className="flex flex-col h-full bg-black overflow-hidden">
+      <header className="shrink-0 p-4 bg-zinc-950 border-b border-zinc-800 space-y-4">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-black tracking-tighter">CAIXA LIVRE</h2>
           <div className="px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-full text-[10px] font-bold text-zinc-500">
@@ -271,16 +268,16 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto p-4">
+      <main className="flex-1 overflow-y-auto p-4 overscroll-contain">
         {cart.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center opacity-30 gap-4">
             <ShoppingBag size={48} />
-            <p className="text-xs font-bold uppercase tracking-widest">Carrinho Vazio</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-center">Inicie a venda lendo um código ou digitando o nome</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3 pb-8">
             {cart.map((item, idx) => (
-              <div key={idx} className="bg-zinc-900 border border-zinc-800 p-4 rounded-2xl flex justify-between items-center">
+              <div key={idx} className="bg-zinc-900 border border-zinc-800 p-4 rounded-2xl flex justify-between items-center animate-in slide-in-from-right duration-200">
                 <div className="flex-1">
                   <h4 className="text-sm font-bold">{item.name}</h4>
                   <div className="flex items-center gap-4 mt-2">
@@ -302,7 +299,7 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
         )}
       </main>
 
-      <footer className="p-6 bg-zinc-950 border-t border-zinc-800 space-y-4">
+      <footer className="shrink-0 p-6 pb-8 bg-zinc-950 border-t border-zinc-800 space-y-4">
         <div className="flex justify-between items-end">
           <div>
             <span className="text-[10px] font-bold text-zinc-500 uppercase">Total da Venda</span>
@@ -318,16 +315,16 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
         <button 
           onClick={startCheckout}
           disabled={total === 0}
-          className="w-full py-5 bg-purple-600 rounded-2xl font-black text-white shadow-lg active:scale-95 disabled:opacity-50"
+          className="w-full py-5 bg-purple-600 rounded-2xl font-black text-white shadow-lg active:scale-95 disabled:opacity-50 transition-all"
         >
           {collectedPayments.length > 0 ? 'PAGAR SALDO RESTANTE' : 'FINALIZAR PAGAMENTO'}
         </button>
       </footer>
 
-      {/* Modal de Checkout */}
+      {/* Modais omitidos para brevidade, mas devem permanecer no arquivo completo */}
       {showCheckout && (
-        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-end justify-center p-4">
-          <div className="w-full max-w-sm bg-zinc-900 border-t border-zinc-800 rounded-t-[40px] p-8 space-y-8 animate-in slide-in-from-bottom duration-300">
+        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-end justify-center p-4 overflow-hidden">
+          <div className="w-full max-w-sm bg-zinc-900 border-t border-zinc-800 rounded-t-[40px] p-8 space-y-8 animate-in slide-in-from-bottom duration-300 max-h-[90dvh] overflow-y-auto pb-12">
             <div className="flex justify-between items-center">
               <h3 className="text-xl font-black">Pagamento</h3>
               <button onClick={() => setShowCheckout(false)} className="bg-zinc-800 p-2 rounded-full"><X size={20}/></button>
@@ -372,6 +369,7 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
                     <input 
                       autoFocus
                       type="number" 
+                      inputMode="decimal"
                       placeholder="0,00"
                       className="bg-transparent text-3xl font-black text-white outline-none w-full"
                       value={partialAmount}
@@ -381,7 +379,7 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
                 </div>
                 <button 
                   onClick={() => partialAmount && setCheckoutStep('method')}
-                  className="w-full py-4 bg-blue-600 rounded-2xl font-black text-white active:scale-95"
+                  className="w-full py-4 bg-blue-600 rounded-2xl font-black text-white active:scale-95 transition-all"
                 >
                   CONTINUAR PARA MÉTODOS
                 </button>
@@ -395,7 +393,7 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
                    <div className="text-[10px] font-bold text-zinc-500 uppercase">Recebendo R$ {parseFloat(partialAmount).toFixed(2)}</div>
                    <button onClick={() => setCheckoutStep('selection')} className="text-[10px] font-bold text-purple-500">Alterar Valor</button>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3 pb-4">
                   {[
                     {id: 'Dinheiro', icon: <Wallet size={18}/>, color: 'text-emerald-500'},
                     {id: 'PIX', icon: <QrCode size={18}/>, color: 'text-purple-500'},
@@ -420,9 +418,8 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
         </div>
       )}
 
-      {/* Validação de Pagamento */}
       {pendingPayment && (
-        <div className="fixed inset-0 z-[60] bg-black/98 backdrop-blur-xl flex flex-col items-center justify-center p-8 animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[60] bg-black/98 backdrop-blur-xl flex flex-col items-center justify-center p-8 animate-in fade-in duration-300 overflow-hidden">
            <div className="w-full max-w-sm space-y-8 text-center">
               <div className="w-20 h-20 bg-zinc-900 border border-zinc-800 rounded-full flex items-center justify-center mx-auto shadow-2xl">
                  <RefreshCw size={32} className="text-purple-400 animate-spin-slow" />
@@ -445,20 +442,19 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
         </div>
       )}
 
-      {/* Resultado Final com Fluxo de Envio em PDF */}
       {lastSale && (
-        <div className="fixed inset-0 z-[70] bg-black/98 backdrop-blur-2xl flex flex-col items-center justify-center p-6 animate-in zoom-in-95 duration-300 overflow-y-auto">
-          <div className="w-full max-w-sm flex flex-col gap-6 my-auto pb-12">
-            <div className="flex flex-col items-center gap-2">
+        <div className="fixed inset-0 z-[70] bg-black/98 backdrop-blur-2xl flex flex-col items-center justify-center p-6 animate-in zoom-in-95 duration-300 overflow-hidden">
+          <div className="w-full max-w-sm flex flex-col gap-6 h-full py-8">
+            <div className="shrink-0 flex flex-col items-center gap-2">
                <CheckCircle2 size={48} className="text-emerald-500" />
                <h2 className="text-xl font-black">Venda Finalizada!</h2>
             </div>
             
-            <div className="rounded-[40px] overflow-hidden border border-zinc-800 shadow-2xl">
+            <div className="flex-1 overflow-y-auto rounded-[40px] border border-zinc-800 shadow-2xl bg-white">
               <ThermalReceipt sale={lastSale} />
             </div>
 
-            <div className="space-y-3">
+            <div className="shrink-0 space-y-3 pt-4">
               <button 
                 onClick={handleSharePDF}
                 disabled={isGeneratingPDF}
@@ -469,7 +465,7 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
                 ) : (
                   <Share2 size={20} />
                 )}
-                ENVIAR CUPOM PDF (WHATSAPP/EMAIL)
+                ENVIAR CUPOM PDF
               </button>
 
               <button 
