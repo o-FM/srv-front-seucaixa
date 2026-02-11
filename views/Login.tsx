@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { User, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
+import { User, Lock, ArrowRight, ShoppingCart } from 'lucide-react';
 import { User as UserType } from '../types';
 
 interface LoginProps {
@@ -26,7 +26,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       <div className="w-full max-w-sm space-y-8 animate-in fade-in zoom-in duration-500">
         <div className="text-center space-y-2">
           <div className="w-20 h-20 bg-purple-600/20 rounded-[32px] flex items-center justify-center mx-auto border border-purple-500/30 mb-4 shadow-2xl shadow-purple-600/20">
-            <ShieldCheck size={40} className="text-purple-500" />
+            <ShoppingCart size={40} className="text-purple-500" />
           </div>
           <h1 className="text-3xl font-black tracking-tighter text-white">PDV MÓVEL</h1>
           <p className="text-zinc-500 text-sm font-medium">Acesse sua conta para operar o caixa</p>
