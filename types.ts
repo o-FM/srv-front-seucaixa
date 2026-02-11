@@ -10,13 +10,11 @@ export interface User {
 }
 
 export interface Product {
-  id: string;
-  name: string;
   barcode: string;
-  price: number;
-  stock: number;
+  productName: string;
+  salePrice: number;
+  currentStock: number;
   category: string;
-  image?: string;
 }
 
 export interface CartItem extends Product {
