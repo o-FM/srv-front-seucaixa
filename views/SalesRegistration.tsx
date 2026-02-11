@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Minus, Trash2, ScanLine, ShoppingBag, CheckCircle2, X, Barcode, Loader2, Share2 } from 'lucide-react';
+import { Plus, Minus, Trash2, ScanLine, ShoppingBag, CheckCircle2, X, Barcode, Loader2, Share2, Terminal } from 'lucide-react';
 import { Product, CartItem, Sale, PaymentEntry } from '../types';
 import Scanner from '../components/Scanner';
 
@@ -68,8 +68,14 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
     <div className="h-full flex flex-col bg-black">
       {/* 1. HEADER FIXO (Busca e Scan) */}
       <header className="shrink-0 p-4 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-md z-10">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-black tracking-tighter text-white">CAIXA LIVRE</h2>
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h2 className="text-xl font-black tracking-tighter text-white">CAIXA LIVRE</h2>
+            <div className="flex items-center gap-1 mt-1">
+              <Terminal size={10} className="text-purple-500" />
+              <span className="text-[8px] font-black text-purple-500/70 uppercase tracking-widest">Develop Mode</span>
+            </div>
+          </div>
           <div className="px-3 py-1 bg-zinc-900 rounded-full text-[9px] font-black text-zinc-500 uppercase tracking-widest border border-zinc-800">
             OP: JOÃO
           </div>
