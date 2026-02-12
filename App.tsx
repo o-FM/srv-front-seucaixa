@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Sale, Product, User, Role } from './types';
 // import { INITIAL_PRODUCTS } from './constants';
-import { getProducts, createProduct, deleteProduct } from "./services/productService";
+import { getProducts, createProduct, deleteProduct, updateProduct } from "./services/productService";
 import Dashboard from './views/Dashboard';
 import SalesRegistration from './views/SalesRegistration';
 import ProductManagement from './views/ProductManagement';
@@ -125,13 +125,11 @@ const App: React.FC = () => {
             products={products}
             onSave={async (product) => {
               try {
-                // if (product.id) {
-                //   await updateProduct(product);
-                // } else {
-                //   await createProduct(product);
-                // }
-
-                await createProduct(product);
+                if (product.id) {
+                  await updateProduct(product);
+                } else {
+                  await createProduct(product);
+                }
 
                 const updated = await getProducts();
                 setProducts(updated);
@@ -166,31 +164,41 @@ const App: React.FC = () => {
     { id: 'settings', label: 'CONTA', icon: <Settings size={20} />, roles: ['Admin', 'Gerente', 'Operador'] },
   ];
 
-  return (
-    <div className="h-full flex flex-col bg-zinc-950 overflow-hidden">
-      <main className="flex-1 overflow-hidden relative w-full max-w-5xl mx-auto">
+    return (
+    <div className="h-screen w-screen max-w-full bg-zinc-950 text-zinc-100 flex flex-col overflow-hidden">
+      {/* MAIN - Com espaço para notch */}
+      <main className="flex-1 overflow-hidden relative w-full" style={{
+        paddingTop: 'max(0px, env(safe-area-inset-top))',
+        paddingLeft: 'max(0px, env(safe-area-inset-left))',
+        paddingRight: 'max(0px, env(safe-area-inset-right))',
+      }}>
         {renderView()}
       </main>
 
-      <nav className="shrink-0 bg-zinc-900/80 backdrop-blur-2xl border-t border-zinc-800/50 flex justify-around items-center px-4 py-3 md:py-4 pb-[calc(env(safe-area-inset-bottom)+12px)] z-50">
-        <div className="w-full max-w-2xl mx-auto flex justify-around">
+      {/* NAV - Com espaço para home indicator */}
+      <nav 
+        className="shrink-0 bg-zinc-900/80 backdrop-blur-2xl border-t border-zinc-800/50 flex justify-around items-center px-4 py-3 z-50"
+        style={{
+          paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+        }}
+      >
+        <div className="w-full flex justify-around">
           {menuItems.filter(item => item.roles.includes(currentUser.role)).map((item) => (
             <button
               key={item.id}
               onClick={() => setCurrentView(item.id as View)}
               className={`flex flex-col items-center gap-1 transition-all flex-1 min-w-[60px] ${
-                currentView === item.id ? 'text-purple-400' : 'text-zinc-500 hover:text-zinc-300'
+                currentView === item.id ? 'text-purple-400' : 'text-zinc-500'
               }`}
             >
-              <div className={`p-2 rounded-xl transition-all ${currentView === item.id ? 'bg-purple-500/10 scale-110' : ''}`}>
+              <div className={`p-2 rounded-xl ${currentView === item.id ? 'bg-purple-500/10' : ''}`}>
                 {item.icon}
               </div>
-              <span className="text-[7px] md:text-[9px] font-black tracking-widest uppercase">{item.label}</span>
+              <span className="text-[8px] font-black uppercase tracking-tight">{item.label}</span>
             </button>
           ))}
         </div>
       </nav>
-      <InstallPrompt />
     </div>
   );
 };

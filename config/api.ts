@@ -31,6 +31,11 @@ export async function http<T>(
       throw new Error(error || `Erro ${response.status} na requisição`);
     }
 
+    // Se o status for 204 (No Content), retorna undefined
+    if (response.status === 204) {
+      return;
+    }
+
     return response.json();
   } catch (error) {
     console.error(`[API Critical Error] ${endpoint}:`, error);
