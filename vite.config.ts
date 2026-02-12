@@ -3,7 +3,7 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
-    const env = loadEnv(mode, '.', '');
+    const env = loadEnv(mode, '.', 'VITE_');
     return {
       server: {
         port: 3000,
@@ -13,15 +13,13 @@ export default defineConfig(({ mode }) => {
       build: {
         outDir: 'dist',
         emptyOutDir: true,
-        rollupOptions: {
-          output: {
-            format: 'es'
-          }
-        }
+        // Remover rollupOptions para deixar Vite fazer seu trabalho
+        sourcemap: mode === 'production' ? false : true,
+        chunkSizeWarningLimit: 1000,
       },
       define: {
-        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
+        // Deixar import.meta.env.VITE_* funcionar automaticamente
+        // Remove: 'process.env.API_KEY' pois não é mais necessário
       },
       resolve: {
         alias: {
