@@ -44,17 +44,30 @@ const App: React.FC = () => {
     return saved ? JSON.parse(saved) : [];
   });
 
-  useEffect(() => {
+    useEffect(() => {
     async function loadProducts() {
       try {
+        console.log('[App] Carregando produtos...');
         const data = await getProducts();
+        console.log('[App] Produtos carregados com sucesso:', data.length);
         setProducts(data);
       } catch (error) {
-        console.warn("API indisponível, usando localStorage");
+        console.error('[App] Erro ao carregar produtos:', error);
+        console.warn("[App] API indisponível, usando localStorage");
 
         const saved = localStorage.getItem('inventory_products');
         if (saved) {
-          setProducts(JSON.parse(saved));
+          try {
+            const localProducts = JSON.parse(saved);
+            console.log('[App] Usando produtos do localStorage:', localProducts.length);
+            setProducts(localProducts);
+          } catch (parseError) {
+            console.error('[App] Erro ao parsear localStorage:', parseError);
+            setProducts([]);
+          }
+        } else {
+          console.warn('[App] Nenhum produto em localStorage');
+          setProducts([]);
         }
       }
     }

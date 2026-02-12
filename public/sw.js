@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'pdv-v1';
+const CACHE_NAME = 'seu-caixa-v1';
 const ASSETS = [
   '/',
   '/index.html',
