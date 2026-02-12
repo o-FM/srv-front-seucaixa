@@ -15,19 +15,26 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
   const [showCheckout, setShowCheckout] = useState(false);
   const [lastSale, setLastSale] = useState<Sale | null>(null);
   const [manualCode, setManualCode] = useState('');
+  const [lastAddedItem, setLastAddedItem] = useState<{product: Product, quantity: number} | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
   const addToCart = (product: Product) => {
+    let currentQty = 1;
     setCart(prev => {
-      const existing = prev.find(item => item.id === product.id);
+      const existing = prev.find(item => item.barcode === product.barcode);
       if (existing) {
-        return prev.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
+        currentQty = existing.quantity + 1;
+        return prev.map(item => item.id === product.barcode ? { ...item, quantity: item.quantity + 1 } : item);
       }
       return [{ ...product, quantity: 1 }, ...prev];
     });
+    setLastAddedItem({ product, quantity: currentQty });
     setManualCode('');
+    
+    // Auto-limpa o feedback após 3 segundos
+    setTimeout(() => setLastAddedItem(null), 3000);
   };
 
   const updateQuantity = (id: string, delta: number) => {
@@ -58,15 +65,22 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
     setShowCheckout(false);
   };
 
-  if (isScannerOpen) return <Scanner onScan={(code) => {
-    const p = products.find(prod => prod.barcode === code);
-    if(p) addToCart(p);
-    setIsScannerOpen(false);
-  }} onClose={() => setIsScannerOpen(false)} />;
+  if (isScannerOpen) return (
+    <Scanner 
+      onScan={(code) => {
+        const p = products.find(prod => prod.barcode === code);
+        if(p) {
+          addToCart(p);
+        }
+      }} 
+      onClose={() => setIsScannerOpen(false)}
+      lastItem={lastAddedItem}
+    />
+  );
 
   return (
     <div className="h-full flex flex-col bg-black">
-      {/* 1. HEADER FIXO (Busca e Scan) */}
+      {/* 1. HEADER FIXO */}
       <header className="shrink-0 p-4 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-md z-10">
         <div className="flex justify-between items-start mb-4">
           <div>
@@ -108,7 +122,7 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
         </div>
       </header>
 
-      {/* 2. ÁREA DE ITENS (O ÚNICO LUGAR COM SCROLL) */}
+      {/* 2. ÁREA DE ITENS */}
       <main className="flex-1 overflow-y-auto p-4 space-y-3">
         {cart.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center opacity-20 gap-4 text-center px-8">
@@ -142,7 +156,7 @@ const SalesRegistration: React.FC<SalesRegistrationProps> = ({ products, onCompl
         )}
       </main>
 
-      {/* 3. RODAPÉ FIXO (Total e Botão de Ação) */}
+      {/* 3. RODAPÉ FIXO */}
       <footer className="shrink-0 p-5 bg-zinc-950 border-t border-zinc-900 space-y-4 shadow-[0_-10px_40px_rgba(0,0,0,0.4)]">
         <div className="flex justify-between items-end">
            <div>
