@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Sale, Product, User, Role } from './types';
 // import { INITIAL_PRODUCTS } from './constants';
-import { getProducts, createProduct, deleteProduct } from "./services/productService";
+import { getProducts, createProduct, deleteProduct, updateProduct } from "./services/productService";
 import Dashboard from './views/Dashboard';
 import SalesRegistration from './views/SalesRegistration';
 import ProductManagement from './views/ProductManagement';
@@ -125,13 +125,11 @@ const App: React.FC = () => {
             products={products}
             onSave={async (product) => {
               try {
-                // if (product.id) {
-                //   await updateProduct(product);
-                // } else {
-                //   await createProduct(product);
-                // }
-
-                await createProduct(product);
+                if (product.id) {
+                  await updateProduct(product);
+                } else {
+                  await createProduct(product);
+                }
 
                 const updated = await getProducts();
                 setProducts(updated);

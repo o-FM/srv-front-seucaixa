@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Search, Plus, MoreVertical, Edit2, Trash, X, Barcode, ScanLine, Save, ArrowLeft } from 'lucide-react';
+import { Search, Plus, MoreVertical, Edit2, Trash, X, Barcode, ScanLine, Save, ArrowLeft, ChevronLeft } from 'lucide-react';
 import { Product } from '../types';
 import Scanner from '../components/Scanner';
 import SafeHeader from '../components/SafeHeader';
@@ -17,9 +17,8 @@ const ProductManagement: React.FC<ProductManagementProps> = ({ products, onSave,
   const [searchTerm, setSearchTerm] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [isEditingProduct, setIsEditingProduct] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Partial<Product> | null>(null);
-
-  console.log("Produtos recebidos:", products);
 
   const filtered = products.filter(p =>
     p.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -29,10 +28,10 @@ const ProductManagement: React.FC<ProductManagementProps> = ({ products, onSave,
   const handleAdd = () => {
     setEditingProduct({
       id: Math.random().toString(36).substr(2, 9),
-      name: '',
+      productName: '',
       barcode: '',
-      price: 0,
-      stock: 0,
+      salePrice: 0,
+      currentStock: 0,
       category: 'Geral',
       image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=200&h=200&fit=crop'
     });
@@ -42,6 +41,7 @@ const ProductManagement: React.FC<ProductManagementProps> = ({ products, onSave,
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
     setIsFormOpen(true);
+    setIsEditingProduct(true)
   };
 
   const handleSave = (e: React.FormEvent) => {
@@ -56,11 +56,12 @@ const ProductManagement: React.FC<ProductManagementProps> = ({ products, onSave,
   if (isScannerOpen) {
     return (
       <Scanner
-        onScan={(code) => {
+        onDetected={(code) => {
           setEditingProduct(prev => prev ? { ...prev, barcode: code } : null);
           setIsScannerOpen(false);
         }}
         onClose={() => setIsScannerOpen(false)}
+        editingProd={isEditingProduct}
       />
     );
   }
@@ -99,7 +100,7 @@ const ProductManagement: React.FC<ProductManagementProps> = ({ products, onSave,
           }}
         >
           <button
-            onClick={() => setEditingId(null)}
+            onClick={() => setEditingProduct(null)}
             className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors"
           >
             <ChevronLeft size={24} />
@@ -107,11 +108,11 @@ const ProductManagement: React.FC<ProductManagementProps> = ({ products, onSave,
           </button>
 
           <h2 className="text-lg font-black tracking-tight text-white flex-1 text-center px-4">
-            {editingId === 'new' ? 'Novo Produto' : 'Editar Produto'}
+            {editingProduct === 'new' ? 'Novo Produto' : 'Editar Produto'}
           </h2>
 
           <button
-            onClick={() => handleSaveProduct()}
+            onClick={() => handleAdd()}
             className="px-4 py-2 bg-purple-600 rounded-xl text-white font-bold text-sm flex items-center gap-2 active:scale-95 transition-transform"
           >
             <Save size={18} />

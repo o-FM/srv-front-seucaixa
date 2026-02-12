@@ -24,6 +24,16 @@ export async function createProduct(product: Product): Promise<Product> {
   });
 }
 
+export async function updateProduct(product: Product): Promise<Product> {
+  return await http<Product>(`/v1/inventory/${product.id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(product)
+  });
+}
+
 export async function getProductsByBarcode(barcode: string) {
   return http<Product>(`/v1/inventory/${barcode}`);
 }
